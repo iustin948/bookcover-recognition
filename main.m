@@ -1,14 +1,27 @@
+I = imread("cover.jpg");
+  grey = rgb2gray(I);
+    inverted = 255 - grey;
+    
+    scanner = ocr(inverted);
+figure 
+imshowpair(I,inverted,"montage")
+scanner = ocr(BW);
+  
+    % Extract words from OCR results
+    words = scanner.Words
+%%
 img = imread("cover.jpg");
-grey = rgb2gray(img);
-%edge = edge(grey,'Prewitt');
-inverted = 255 - grey;
-scanner = ocr(inverted);
-figure;
-imshow(inverted)
-% Extract text regions
-bboxes = scanner.WordBoundingBoxes;
-words = scanner.Words;
-
+img  = snapshot(webcam);
+ % Convert the image to grayscale
+    grey = rgb2gray(img);
+   
+    ed = edge(grey,"prewitt",0.1);
+     imshow(ed);
+    % Perform OCR on the processed image
+    scanner = ocr(ed);
+  
+    % Extract words from OCR results
+    words = scanner.Words
 %% api request
 % Combine the words into a single query string
 query_string = strjoin(words, '+');
@@ -22,7 +35,7 @@ response = webread(query_url);
 
 % Display the response
 disp(response);
-data = response.items(1).volumeInfo;
+data = response.items{1,1}.volumeInfo;
 
 %% achizitie de imagini
 vid = videoinput('winvideo', 1);
@@ -62,3 +75,27 @@ stop(vid);
 % Clean up
 delete(vid);
 clear vid;
+
+%%
+% Find all existing video input objects
+vidObjs = imaqfind;
+
+% Delete all existing video input objects
+delete(vidObjs);
+
+%%
+boundingBoxes = scanner.WordBoundingBoxes;
+hold on;
+
+% Iterate through each bounding box
+for i = 1:size(boundingBoxes, 1)
+    x = boundingBoxes(i, 1);
+    y = boundingBoxes(i, 2);
+    width = boundingBoxes(i, 3);
+    height = boundingBoxes(i, 4);
+    
+    % Draw empty rectangle
+    rectangle('Position', [x, y, width, height], 'EdgeColor', 'red', 'LineWidth', 2);
+end
+
+hold off;
